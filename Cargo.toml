@@ -1,0 +1,9 @@
+[package]
+
+name = "octree"
+version = "0.0.1"
+authors = ["Ronald <selsery@gmail.com>"]
+
+[dependencies.nalgebra]
+git = "https://github.com/sebcrozet/nalgebra"
+
