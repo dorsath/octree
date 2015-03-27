@@ -29,7 +29,7 @@ mod octree {
 
     pub fn init(){
         let result: Coordinates = corners();
-        let width = 10_000.0f64;
+        let width = 100.0f64;
         let root = Coordinate::new(0.0, 0.0, 0.0);
         let result = build(root, width);
         output_to_file(result, width);
@@ -56,14 +56,21 @@ mod octree {
     }
 
     fn value_function(coord: &Coordinate) -> f64 {
-        let root = Coordinate::new(200.0, 0.5, 200.0);
-        let diff = root - *coord;
-        let norm = diff.norm();
-        if norm == 0.0 {
-            return 1_000f64;
-        } else {
-            return 1.0f64 / norm / norm;
+        let objects = vec!(
+            Coordinate::new(10.0, 0.5, 10.0),
+            Coordinate::new(20.0, 0.5, 10.0)
+        );
+
+        let mut value = 0.0f64;
+        for obj in objects {
+            let norm = (obj - *coord).norm();
+            if norm == 0.0 {
+                value += 1_000f64;
+            } else {
+                value += (1.0f64 / norm / norm);
+            }
         }
+        return value;
     }
 
     fn split(root: &Coordinate, width: f64) -> bool {
