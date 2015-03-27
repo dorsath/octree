@@ -8,12 +8,6 @@ enum Leaf {
     Value(f64),
 }
 
-impl Leaf {
-    fn new_node() -> Leaf {
-         Node(Octree::new())
-    }
-}
-
 type Octree = Vec<Leaf>;
 
 
@@ -21,7 +15,6 @@ type Octree = Vec<Leaf>;
 
 mod octree {
     use nalgebra::*;
-    use std::collections::HashMap;
     use std::path::Path;
     use std::io::prelude::*;
     use std::fs::File;
@@ -52,7 +45,7 @@ mod octree {
 
         for corner in corners().iter() {
             let coordinate = *corner * width + root;
-            let r = split(&coordinate, 1.0f64) && width > 0.2;
+            let r = split(&coordinate, width) && width > 0.2;
             println!("split: {:?}", r);
             if r {
                 let node = build(coordinate, width / 2.0);
@@ -92,35 +85,20 @@ mod octree {
     }
 
     fn split(root: &Coordinate, width: f64) -> bool {
-        let qw = width / 4.0; //quarter width
-        let center: Coordinate = *root + Coordinate::new(qw, qw ,qw);
-        let center_value = value_function(root);
+        let hw = width / 2.0; //half width
+        let center: Coordinate = *root + Coordinate::new(hw, hw ,hw);
+        let center_value = value_function(&center);
         //println!("{:?}", center);
         for node in corners() {
-            let node_center = *root + (node * width / 2.0);
-            let r = (value_function(&node_center) - center_value).abs();
+            let node_corner = *root + (node * width);
+            let r = (value_function(&node_corner) - center_value).abs();
             //println!("{:?}", r);
-            if r > (0.05 / width / width) {
+            if r > (0.2 / width / width) {
                 return true;
             }
         }
         return false;
     }
-
-    fn middle() -> Vec3<f64> {
-        return Vec3::new(0.5, 0.5, 0.5);
-    }
-
-    fn centers() -> Coordinates {
-        let mut octree = corners();
-
-        for n in 0..8 {
-            octree[n] = octree[n] + 0.25;
-        }
-
-        return octree;
-    }
-
 
     fn corners() -> Coordinates {
         let mut corners = Coordinates::new();
