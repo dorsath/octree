@@ -29,9 +29,6 @@ mod octree {
 
     pub fn init(){
         let result: Coordinates = corners();
-        //for x in result.iter() {
-        //    println!("{:?} \t {:?} \t {:?}", x, (*x * 2.0).normalize(), (*x * 2.0).norm());
-        //}
         let width = 4.0f64;
         let root = Coordinate::new(0.0, 0.0, 0.0);
         let result = build(root, width);
@@ -55,22 +52,9 @@ mod octree {
                 let val = value_function(&center);
                 octree.push(Leaf::Value(val));
             }
-            //println!("{:?} \t {:?} \t {:?}", x, (*x * 2.0).normalize(), (*x * 2.0).norm());
         }
 
         return Leaf::Node(octree);
-        //octree.push(Leaf::Value(2.0));
-        //octree.push(Leaf::new_node());
-        //for leaf in octree {
-        //    match leaf {
-        //        Leaf::Value(x) => {
-        //            println!("{:?}", x);
-        //        },
-        //        Leaf::Node(node) => {
-        //            println!("{:?}", node.len());
-        //        },
-        //    }
-        //}
     }
 
     fn value_function(coord: &Coordinate) -> f64 {
@@ -88,11 +72,9 @@ mod octree {
         let hw = width / 2.0; //half width
         let center: Coordinate = *root + Coordinate::new(hw, hw ,hw);
         let center_value = value_function(&center);
-        //println!("{:?}", center);
         for node in corners() {
             let node_corner = *root + (node * width);
             let r = (value_function(&node_corner) - center_value).abs();
-            //println!("{:?}", r);
             if r > (0.2 / width / width) {
                 return true;
             }
