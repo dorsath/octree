@@ -26,8 +26,5 @@ file = "results.txt"
 #plot 'results.txt' using 1:2 with lines, \
 #     'results.txt' using 1:3 with lines
 
-set xrange [0:5]
-set yrange [0:5]
-set zrange [0:5]
-splot file using 1:2:3 pt 7 ps 0.3
+splot file using 1:3:4 pt 7 ps 0.3
 pause -1
