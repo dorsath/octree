@@ -1,4 +1,5 @@
 extern crate nalgebra;
+use nalgebra::*;
 
 
 use Leaf::{Node,Value};
@@ -9,7 +10,8 @@ enum Leaf {
 }
 
 type Octree = Vec<Leaf>;
-
+pub type Coordinate = Vec3<f64>;
+type Coordinates = Vec<Coordinate>;
 
 
 
@@ -22,18 +24,17 @@ mod octree {
     
     
     
-    use {Octree, Leaf};
+    use {Octree, Leaf, Coordinate, Coordinates, Particle};
 
-    type Coordinate = Vec3<f64>;
-    type Coordinates = Vec<Coordinate>;
 
-    pub fn init(){
+    pub fn init() -> Leaf{
         let result: Coordinates = corners();
         let width = 100.0f64;
         let root = Coordinate::new(0.0, 0.0, 0.0);
         let result = build(root, width);
-        output_to_file(result, width);
+        //output_to_file(result, width);
 
+        return result;
     }
 
     fn build(root: Coordinate, width: f64) -> Leaf {
@@ -97,7 +98,7 @@ mod octree {
         return corners;
     }
 
-    fn coordinate_of_index(index: u32) -> Coordinate {
+    fn coordinate_of_index(index: i8) -> Coordinate {
         return Vec3::new(
             (index % 2) as f64, 
             ((index / 2) % 2) as f64,
@@ -144,10 +145,72 @@ mod octree {
         return output;
     }
 
+    pub fn find_value_at(leaf: Leaf, coord: Coordinate, root: Coordinate, width: f64) -> f64 {
+        match leaf {
+            Leaf::Value(x) => {
+                return x;
+            },
+            Leaf::Node(node) => {
+                let mut vec = (coord - root) / width;
+                let index: i8 = vec[2].round() as i8 * 4 + vec[1].round() as i8 * 2 + vec[0].round() as i8;
+                let new_root = root + coordinate_of_index(index) * width / 2.0;
+                let mut n = 0;
+                for node_leaf in node {
+                    if n == index {
+                        return find_value_at(node_leaf, coord, new_root, width / 2.0);
+                    }
+                    n += 1;
+                }
+
+                return 0.0;
+
+            },
+
+        }
+
+
+        return 0.0;
+    }
+
+}
+
+pub struct Particle {
+    pub pos:       Vec3<f64>,
+    pub vel:       Vec3<f64>,
+    pub acc:   Vec3<f64>
 }
 
 
 fn main() {
-    octree::init();
+    let result = octree::init();
+    println!("Done creating octree");
+
+    let coord = Vec3::new(5.0, 5.0, 50.0);
+    //let val = octree::find_value_at(result, coord, Vec3::new(0.0, 0.0, 0.0), 100f64);
+    //println!("{:?}", val);
+
+
+    let mut particle = Particle{
+        pos: Vec3::new(2.0, 2.0, 2.0),
+        vel: Vec3::new(1.0, 0.0, 0.0),
+        acc: Vec3::new(0.0, 0.0, 0.0)};
+    let dt = 0.01;
+    let mass = 1.0;
+
+    let val = octree::find_value_at(result, coord, Vec3::new(0.0, 0.0, 0.0), 100f64);
+    let factor;
+    if particle.vel.norm() > 0.01 {
+        factor = particle.vel.normalize() * -1.0 * val;
+    } else {
+        factor = Vec3::new(0.0, 0.0, 0.0);
+    }
+
+
+    particle.pos = particle.pos + particle.vel * dt + factor / mass * dt * dt;
+    particle.vel = particle.vel + factor / mass * dt;
+
+
+
+    println!("{:?}", particle.pos);
 }
 
