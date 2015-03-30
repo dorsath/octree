@@ -8,7 +8,7 @@ use nalgebra::*;
 fn val_func(coord: &Coordinate) -> f64 {
     let objects = vec!(
         //Coordinate::new(0.0, 0.5, 0.0),
-        Coordinate::new(0.5, 0.0, 0.5)
+        Coordinate::new(5.0, 1.0, 5.0)
     );
 
     let mut value = 0.0f64;
@@ -40,7 +40,8 @@ fn points_out(node: Node, root: Coordinate, width: f64) {
     match node {
         Node::Value(x) => {
             if root.y == 0.0 {
-                println!("{:?}\t{:?}\t{:?}\t{:?}", root.x, root.y, root.z, x);
+                let hw = width / 2.0;
+                println!("{:?}\t{:?}\t{:?}\t{:?}", root.x + hw, root.y + hw, root.z + hw, x);
             }
         }
         Node::Group(x) => {
@@ -55,8 +56,10 @@ fn points_out(node: Node, root: Coordinate, width: f64) {
 }
 
 fn main() {
-    let width = 1.0f64;
-    let mut tree: Octree = octree::new(width, val_func);
+    let width = 10.0f64;
+    let root = Coordinate::new(0.0, 0.0, 0.0);
+
+    let mut tree: Octree = octree::new(width, root, val_func);
     tree.build();
 
     let node = tree.nodes.clone();

@@ -28,7 +28,7 @@ impl Node {
 
         for corner in corners().iter() {
             let coord = *corner * width + root;
-            if width > 0.002 && split(&coord, width, value_function) {
+            if width >= 0.002 && split(&coord, width, value_function) {
                 tree.push(Node::build(coord, width / 2.0, value_function));
             } else {
                 let center = coord + Coordinate::new(qw, qw ,qw);
@@ -48,9 +48,7 @@ impl Octree {
     }
 }
 
-pub fn new(width: f64, value_function: fn(&Coordinate) -> f64) -> Octree {
-    let root = Coordinate::new(0.0, 0.0, 0.0);
-
+pub fn new(width: f64, root: Coordinate, value_function: fn(&Coordinate) -> f64) -> Octree {
     return Octree {
         root: root,
         width: width,
@@ -72,7 +70,7 @@ fn split(root: &Coordinate, width: f64, value_function: fn(&Coordinate) -> f64) 
     for node in corners() {
         let node_corner = *root + (node * width);
         let r = (value_function(&node_corner) - center_value).abs();
-        if r > (0.2 / width / width) {
+        if r >= (0.2 / width / width) {
             return true;
         }
     }
