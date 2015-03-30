@@ -1,4 +1,4 @@
-file = "results.txt"
+file = "out.txt"
 # W = F * t
 # W/t = F
 #f(x) = 1/((x-4)*(x-2)*(x-1))
@@ -28,6 +28,6 @@ file = "results.txt"
 
 #set xrange [0:5]
 #set yrange [0:5]
-set zrange [0:50]
+#set zrange [0:1000]
 splot file using 1:3:4 pt 7 ps 0.3
 pause -1
