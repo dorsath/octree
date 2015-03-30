@@ -1,6 +1,7 @@
 extern crate nalgebra;
 
 use octree::nalgebra::Vec3 as Vec3;
+use std::num::Float;
 
 #[derive(Debug, Clone)]
 pub enum Node {
