@@ -6,15 +6,15 @@ use std::num::Float;
 #[derive(Debug, Clone)]
 pub enum Node {
     Group(Vec<Node>),
-    Value(f64),
-
+    Filled,
+    Empty,
 }
 
 pub struct Octree {
     pub root: Coordinate,
     pub width: f64,
     pub nodes: Node,
-    pub value_function: fn(&Coordinate) -> f64,
+    pub value_function: fn(&Coordinate) -> bool,
 }
 
 pub type Coordinate  = Vec3<f64>;
@@ -23,18 +23,19 @@ pub type Coordinates = Vec<Coordinate>;
 //type Coordinates = Vec<Coordinate>;
 
 impl Node {
-    pub fn build(root: Coordinate, width: f64, value_function: fn(&Coordinate) -> f64) -> Node {
+    pub fn build(root: Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> Node {
         let qw = width / 4.0; //quarter width
         let mut tree: Vec<Node> = Vec::new();
 
         for corner in corners().iter() {
             let coord = *corner * width + root;
-            if width >= 0.002 && split(&coord, width, value_function) {
+            let cube_status = split(&coord, width, value_function);
+            if width >= 0.4 && cube_status == 'p' {
                 tree.push(Node::build(coord, width / 2.0, value_function));
+            } else if cube_status == 'f'  {
+                tree.push(Node::Filled);
             } else {
-                let center = coord + Coordinate::new(qw, qw ,qw);
-                let val = value_function(&center);
-                tree.push(Node::Value(val));
+                tree.push(Node::Empty);
             }
         }
 
@@ -49,11 +50,11 @@ impl Octree {
     }
 }
 
-pub fn new(width: f64, root: Coordinate, value_function: fn(&Coordinate) -> f64) -> Octree {
+pub fn new(width: f64, root: Coordinate, value_function: fn(&Coordinate) -> bool) -> Octree {
     return Octree {
         root: root,
         width: width,
-        nodes: Node::Value(0.0),
+        nodes: Node::Filled,
         value_function: value_function      
     }
 }
@@ -64,18 +65,39 @@ pub fn new(width: f64, root: Coordinate, value_function: fn(&Coordinate) -> f64)
 //}
 
 
-fn split(root: &Coordinate, width: f64, value_function: fn(&Coordinate) -> f64) -> bool {
+fn split(root: &Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> char {
+    let mut filled = 0;
+    let mut empty = 0;
+
     let hw = width / 2.0; //half width
     let center: Coordinate = *root + Coordinate::new(hw, hw ,hw);
     let center_value = value_function(&center);
+
+    if center_value {
+        filled += 1;
+    } else {
+        empty += 1;
+    }
+
+
     for node in corners() {
         let node_corner = *root + (node * width);
-        let r = (value_function(&node_corner) - center_value).abs();
-        if r >= (0.2 / width / width) {
-            return true;
+        
+        if value_function(&node_corner) {
+            filled += 1;
+        } else {
+            empty += 1;
+        }
+
+        if filled > 0 && empty > 0 {
+            return 'p';
         }
     }
-    return false;
+    if filled == 9 {
+        return 'f'
+    } else {
+        return 'e'
+    }
 }
 
 
