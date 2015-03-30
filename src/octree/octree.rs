@@ -1,6 +1,6 @@
 extern crate nalgebra;
 
-use octree::nalgebra::Vec3 as Vec3;
+use nalgebra::*;
 use std::num::Float;
 
 #[derive(Debug, Clone)]

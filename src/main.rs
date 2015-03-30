@@ -1,7 +1,7 @@
 extern crate nalgebra;
 pub mod octree;
 
-use octree::{Coordinate, Octree, Node};
+use octree::octree::*;
 
 use nalgebra::*;
 
@@ -36,7 +36,7 @@ fn points_out(node: Node, root: Coordinate, width: f64) {
         Node::Group(x) => {
             let mut n = 0;
             for subnode in x {
-                let coord = octree::corners()[n] * width + root;
+                let coord = corners()[n] * width + root;
                 points_out(subnode, coord, width / 2.0);
                 n += 1;
             }
@@ -50,7 +50,7 @@ fn main() {
     let width = 10.0f64;
     let root = Coordinate::new(0.0, 0.0, 0.0);
 
-    let mut tree: Octree = octree::new(width, root, val_func);
+    let mut tree: Octree = octree::octree::new(width, root, val_func);
     tree.build();
 
     let node = tree.nodes.clone();
