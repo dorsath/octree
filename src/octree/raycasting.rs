@@ -25,10 +25,11 @@ pub struct Face {
 
 
 pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
-    corners();
+    let value_function = tree.value_function;
+
     let faces = faces(width, root);
     let mut closest: f64 = -1.0;
-    let mut largest: f64 = 0.0;
+    let mut largest: f64 = -2.0;
 
     //find the entry and exit position of the ray
     for face in faces.iter() {
@@ -39,6 +40,8 @@ pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
 
         let p3_1 = face.point - pixel.point;
         let distance_to_entry = face.normal.dot(&p3_1) / denominator;
+
+        let coordinate = pixel.coord_at(distance_to_entry);
 
         if closest < 0.0 || closest > distance_to_entry {
             closest = distance_to_entry;
@@ -51,7 +54,7 @@ pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
 
     //move the ray through the cube looking up values under coordinates until it finds a filled cube
     let mut distance = closest;
-    while distance < largest {
+    while distance <= largest {
         let coordinate = pixel.coord_at(distance);
         let (val, width) = tree.value_at(coordinate);
         distance += width;

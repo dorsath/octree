@@ -41,26 +41,22 @@ impl Node {
         return Node::Group(tree);
     }
 
-    pub fn find_value_at(node: Node, coord: Coordinate, root: Coordinate, width: f64) -> (char, f64) {
+    pub fn find_value_at(node: &Node, coord: Coordinate, root: Coordinate, width: f64) -> (char, f64) {
         match node {
-            Node::Filled => {
+            &Node::Filled => {
                 return ('f', width);
             },
-            Node::Empty => {
+            &Node::Empty => {
                 return ('e', width);
             },
-            Node::Group(group) => {
-                
+            &Node::Group(ref group) => {
                 let mut vec = (coord - root) / width;
-                let index: i8 = vec[2].round() as i8 * 4 + vec[1].round() as i8 * 2 + vec[0].round() as i8;
-                let new_root = root + corner(index) * width;
-                let mut n = 0;
-                for node in group {
-                    if n == index {
-                        return Node::find_value_at(node, coord, new_root, width / 2.0);
-                    }
-                    n += 1;
+                let index: i16 = vec[2].round() as i16 * 4 + vec[1].round() as i16 * 2 + vec[0].round() as i16;
+                if index < 0 || index > 7 {
+                    return ('e', width);
                 }
+                let new_root = root + corner(index) * width;
+                return Node::find_value_at(&group[index as usize], coord, new_root, width / 2.0);
 
                 return ('e', width);
             },
@@ -76,9 +72,7 @@ impl Octree {
     }
 
     pub fn value_at(&self, coordinate: Coordinate) -> (char, f64) {
-
-        let node = self.nodes.clone(); //quick fix, need proper pointer work
-        return Node::find_value_at(node, coordinate, self.root, self.width);
+        return Node::find_value_at(&self.nodes, coordinate, self.root, self.width);
     }
 }
 
@@ -141,7 +135,7 @@ pub fn corners() -> Coordinates {
     ]
 }
 
-pub fn corner(index: i8) -> Coordinate {
+pub fn corner(index: i16) -> Coordinate {
     return corners()[index as usize];
 }
 

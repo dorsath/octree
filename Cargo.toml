@@ -7,3 +7,6 @@ authors = ["Ronald <selsery@gmail.com>"]
 [dependencies.nalgebra]
 git = "https://github.com/sebcrozet/nalgebra"
 
+[dependencies]
+image = "*"
+
