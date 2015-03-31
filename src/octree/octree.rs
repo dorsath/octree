@@ -29,7 +29,7 @@ impl Node {
         for corner in corners().iter() {
             let coord = *corner * width + root;
             let cube_status = split(&coord, width, value_function);
-            if width >= 0.4 && cube_status == 'p' {
+            if width >= 0.1 && cube_status == 'p' {
                 tree.push(Node::build(coord, width / 2.0, value_function));
             } else if cube_status == 'f'  {
                 tree.push(Node::Filled);
@@ -40,6 +40,33 @@ impl Node {
 
         return Node::Group(tree);
     }
+
+    pub fn find_value_at(node: Node, coord: Coordinate, root: Coordinate, width: f64) -> (char, f64) {
+        match node {
+            Node::Filled => {
+                return ('f', width);
+            },
+            Node::Empty => {
+                return ('e', width);
+            },
+            Node::Group(group) => {
+                
+                let mut vec = (coord - root) / width;
+                let index: i8 = vec[2].round() as i8 * 4 + vec[1].round() as i8 * 2 + vec[0].round() as i8;
+                let new_root = root + corner(index) * width;
+                let mut n = 0;
+                for node in group {
+                    if n == index {
+                        return Node::find_value_at(node, coord, new_root, width / 2.0);
+                    }
+                    n += 1;
+                }
+
+                return ('e', width);
+            },
+
+        }
+    }
 }
 
 impl Octree {
@@ -48,9 +75,10 @@ impl Octree {
 
     }
 
-    pub fn value_at(&self, coordinate: Coordinate) -> char {
+    pub fn value_at(&self, coordinate: Coordinate) -> (char, f64) {
 
-        return 'p';
+        let node = self.nodes.clone(); //quick fix, need proper pointer work
+        return Node::find_value_at(node, coordinate, self.root, self.width);
     }
 }
 
@@ -62,12 +90,6 @@ pub fn new(width: f64, root: Coordinate, value_function: fn(&Coordinate) -> bool
         value_function: value_function      
     }
 }
-
-//pub fn build(width: f64) -> Octree{
-//    let root = Coordinate::new(0.0, 0.0, 0.0);
-//    return Octree { width: width, nodes: Node::build(root, width) }
-//}
-
 
 fn split(root: &Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> char {
     let mut filled = 0;
@@ -117,5 +139,9 @@ pub fn corners() -> Coordinates {
         Vec3::new(0.0, 0.5, 0.5),
         Vec3::new(0.5, 0.5, 0.5)
     ]
+}
+
+pub fn corner(index: i8) -> Coordinate {
+    return corners()[index as usize];
 }
 

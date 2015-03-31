@@ -24,10 +24,11 @@ pub struct Face {
 }
 
 
-pub fn build(pixel: Pixel, width: f64, root: Coordinate){
+pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate){
     corners();
     let faces = faces(width, root);
     let mut closest: f64 = -1.0;
+    let mut largest: f64 = 0.0;
 
     for face in faces.iter() {
         let denominator = face.normal.dot(&pixel.normal);
@@ -41,11 +42,22 @@ pub fn build(pixel: Pixel, width: f64, root: Coordinate){
         if closest < 0.0 || closest > distance_to_entry {
             closest = distance_to_entry;
         }
+
+        if largest < distance_to_entry {
+            largest = distance_to_entry;
+        }
     }
 
-
-    let coordinate = pixel.coord_at(closest);
-    println!("{:?}", coordinate);
+    let mut distance = closest;
+    while distance < largest {
+        let coordinate = pixel.coord_at(distance);
+        let (val, width) = tree.value_at(coordinate);
+        println!("and results in: {:?} at a distance of {:?}", val, distance);
+        distance += width;
+        if val == 'f' {
+            break;
+        }
+    }
 }
 
 pub fn faces(width: f64, root: Coordinate) -> Vec<Face> {

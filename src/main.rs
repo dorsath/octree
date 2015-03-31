@@ -56,10 +56,10 @@ fn main() {
 
     let pixel = Pixel { 
         normal: Vector::new(0.0, 0.0, 1.0),
-        point: Coordinate::new(0.0, 0.0, -5.0)
+        point: Coordinate::new(7.0, 7.0, -5.0)
     };
 
-    let a = octree::raycasting::build(pixel, width, root);
+    let a = octree::raycasting::build(&tree, pixel, width, root);
 
     println!("{:?}", a);
 
