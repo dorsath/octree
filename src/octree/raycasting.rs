@@ -24,12 +24,13 @@ pub struct Face {
 }
 
 
-pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate){
+pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
     corners();
     let faces = faces(width, root);
     let mut closest: f64 = -1.0;
     let mut largest: f64 = 0.0;
 
+    //find the entry and exit position of the ray
     for face in faces.iter() {
         let denominator = face.normal.dot(&pixel.normal);
         if denominator == 0.0 {
@@ -48,16 +49,17 @@ pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate){
         }
     }
 
+    //move the ray through the cube looking up values under coordinates until it finds a filled cube
     let mut distance = closest;
     while distance < largest {
         let coordinate = pixel.coord_at(distance);
         let (val, width) = tree.value_at(coordinate);
-        println!("and results in: {:?} at a distance of {:?}", val, distance);
         distance += width;
         if val == 'f' {
-            break;
+            return true;
         }
     }
+    return false;
 }
 
 pub fn faces(width: f64, root: Coordinate) -> Vec<Face> {

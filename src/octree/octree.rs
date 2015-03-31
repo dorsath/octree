@@ -29,7 +29,7 @@ impl Node {
         for corner in corners().iter() {
             let coord = *corner * width + root;
             let cube_status = split(&coord, width, value_function);
-            if width >= 0.1 && cube_status == 'p' {
+            if width >= 0.4 && cube_status == 'p' {
                 tree.push(Node::build(coord, width / 2.0, value_function));
             } else if cube_status == 'f'  {
                 tree.push(Node::Filled);
