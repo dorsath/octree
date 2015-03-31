@@ -24,7 +24,6 @@ pub type Coordinates = Vec<Coordinate>;
 
 impl Node {
     pub fn build(root: Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> Node {
-        let qw = width / 4.0; //quarter width
         let mut tree: Vec<Node> = Vec::new();
 
         for corner in corners().iter() {
@@ -47,6 +46,11 @@ impl Octree {
     pub fn build(&mut self) {
         self.nodes = Node::build(self.root, self.width, self.value_function);
 
+    }
+
+    pub fn value_at(&self, coordinate: Coordinate) -> char {
+
+        return 'p';
     }
 }
 

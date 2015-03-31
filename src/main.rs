@@ -2,6 +2,7 @@ extern crate nalgebra;
 pub mod octree;
 
 use octree::octree::*;
+use octree::raycasting::{Pixel, Vector};
 
 use nalgebra::*;
 
@@ -53,7 +54,16 @@ fn main() {
     let mut tree: Octree = octree::octree::new(width, root, val_func);
     tree.build();
 
-    let node = tree.nodes.clone();
-    points_out(node, tree.root, tree.width);
+    let pixel = Pixel { 
+        normal: Vector::new(0.0, 0.0, 1.0),
+        point: Coordinate::new(0.0, 0.0, -5.0)
+    };
+
+    let a = octree::raycasting::build(pixel, width, root);
+
+    println!("{:?}", a);
+
+    //let node = tree.nodes.clone();
+    //points_out(node, tree.root, tree.width);
     //debug_out(tree);
 }
