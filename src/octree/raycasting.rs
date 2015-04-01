@@ -24,7 +24,7 @@ pub struct Face {
 }
 
 
-pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
+pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> u8{
     let value_function = tree.value_function;
 
     let faces = faces(width, root);
@@ -42,6 +42,10 @@ pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
         let distance_to_entry = face.normal.dot(&p3_1) / denominator;
 
         let coordinate = pixel.coord_at(distance_to_entry);
+        if tree.coordinate_in_cube(coordinate) == false {
+            continue;
+        }
+
 
         if closest < 0.0 || closest > distance_to_entry {
             closest = distance_to_entry;
@@ -56,13 +60,13 @@ pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> bool{
     let mut distance = closest;
     while distance <= largest {
         let coordinate = pixel.coord_at(distance);
-        let (val, width) = tree.value_at(coordinate);
-        distance += width;
+        let (val, node_size) = tree.value_at(coordinate);
+        distance += node_size;
         if val == 'f' {
-            return true;
+            return ((1.0 - distance / width) * 255.0) as u8 ;
         }
     }
-    return false;
+    return 0;
 }
 
 pub fn faces(width: f64, root: Coordinate) -> Vec<Face> {

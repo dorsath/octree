@@ -52,9 +52,6 @@ impl Node {
             &Node::Group(ref group) => {
                 let mut vec = (coord - root) / width;
                 let index: i16 = vec[2].round() as i16 * 4 + vec[1].round() as i16 * 2 + vec[0].round() as i16;
-                if index < 0 || index > 7 {
-                    return ('e', width);
-                }
                 let new_root = root + corner(index) * width;
                 return Node::find_value_at(&group[index as usize], coord, new_root, width / 2.0);
 
@@ -73,6 +70,13 @@ impl Octree {
 
     pub fn value_at(&self, coordinate: Coordinate) -> (char, f64) {
         return Node::find_value_at(&self.nodes, coordinate, self.root, self.width);
+    }
+
+    pub fn coordinate_in_cube(&self, coordinate: Coordinate) -> bool {
+        let relative = coordinate - self.root;
+        return (relative.x >= 0.0 && relative.x <= self.width && 
+        relative.y >= 0.0 && relative.y <= self.width && 
+        relative.z >= 0.0 && relative.z <= self.width);
     }
 }
 

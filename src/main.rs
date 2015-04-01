@@ -8,6 +8,7 @@ use octree::raycasting::{Pixel, Vector};
 use std::num::Float;
 use nalgebra::*;
 use std::fs::File;
+use std::path::Path;
 
 use image::GenericImage;
 
@@ -60,37 +61,42 @@ fn main() {
     let mut tree: Octree = octree::octree::new(width, root, val_func);
     tree.build();
 
-    let img_width = 40;
-    let img_height = 30;
+    let img_width = 400;
+    let img_height = 300;
 
 
     let ratio = img_height as f64 / img_width as f64;
-    let screen_position = Coordinate::new(5.0, 5.0, -20.0);
-    let camera_position = Coordinate::new(5.0, 5.0, -35.0);
-    let field_of_view = 45.0; //deg
+    let screen_position = Coordinate::new(5.0, 5.0, 0.0);
+    let camera_position = Coordinate::new(5.0, 5.0, -10.0);
+    let field_of_view = 60.0; //deg
     let dx =  (Float::sin(field_of_view / 2.0) * (camera_position.z - screen_position.z) * 2.0) / img_width as f64;
-    let dy = dx * ratio;
+    let dy = dx; 
+    
+    let mut imgbuf = image::ImageBuffer::new(img_width, img_height);
+    
+    for (img_x, img_y, img_pixel) in imgbuf.enumerate_pixels_mut() {
+        let x = img_x as f64 - (img_width as f64)/2.0;
+        let y = img_y as f64 - (img_height as f64)/2.0;
 
-    println!("{:?}", ratio);
+        let point   = screen_position + Coordinate::new(dx * (x as f64), dy * (y as f64), 0.0);
+        let normal  = (camera_position - point).normalize();
 
+        let pixel = Pixel { 
+            normal: normal,
+            point: point
+        };
+        //println!("{:?}\t{:?}\t{:?}", normal.x, normal.y, normal.z);
+        //println!("{:?} {:?}", normal, point);
+        let a = octree::raycasting::build(&tree, pixel, width, root);
+        //println!("{:?} {:?} {:?}", normal, point, a);
 
-    for x in (img_width / -2)..(img_width / 2) {
-        for y in (img_height / -2)..(img_height / 2) {
-
-            let point   = screen_position + Coordinate::new(dx * (x as f64), dy * (y as f64), 0.0);
-            let normal  = (point - camera_position).normalize();
-
-            let pixel = Pixel { 
-                normal: normal,
-                point: point
-            };
-            //println!("{:?} {:?}", normal, point);
-            //println!("{:?} {:?}", normal, point);
-            let a = octree::raycasting::build(&tree, pixel, width, root);
-
-            println!("{:?} {:?} {:?}", normal, point, a);
-        }
+        *img_pixel = image::Luma([a]);
     }
+
+    let ref mut fout = File::create(&Path::new("octree.png")).unwrap();
+    image::ImageLuma8(imgbuf).save(fout, image::PNG);
+    
+    
     
    
     //Vec3 { x: 0, y: 0, z: 1 } Vec3 { x: 5, y: 5, z: -20 } false
