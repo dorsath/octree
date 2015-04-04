@@ -35,35 +35,11 @@ fn debug_out(tree: Octree) {
     }
 }
 
-fn points_out(node: Node, root: Coordinate, width: f64) {
-    match node {
-        Node::Filled => {
-            let hw = width / 2.0;
-            println!("{:?}\t{:?}\t{:?}", root.x + hw, root.y + hw, root.z + hw);
-        }
-        Node::Group(x) => {
-            let mut n = 0;
-            for subnode in x {
-                let coord = corners()[n] * width + root;
-                points_out(subnode, coord, width / 2.0);
-                n += 1;
-            }
-        }
-        Node::Empty => {
-        }
-    }
-}
-
-fn main() {
-    let width = 10.0f64;
-    let root = Coordinate::new(0.0, 0.0, 0.0);
-
-    let mut tree: Octree = octree::octree::new(width, root, val_func);
-    tree.build();
-
+fn image_out(tree: &Octree) {
+    let width = tree.width;
+    let root = tree.root;
     let img_width = 400;
     let img_height = 300;
-
 
     let ratio = img_height as f64 / img_width as f64;
     let screen_position = Coordinate::new(5.0, 5.0, 0.0);
@@ -96,6 +72,36 @@ fn main() {
     let ref mut fout = File::create(&Path::new("octree.png")).unwrap();
     image::ImageLuma8(imgbuf).save(fout, image::PNG);
     
+}
+
+fn points_out(node: Node, root: Coordinate, width: f64) {
+    match node {
+        Node::Filled => {
+            let hw = width / 2.0;
+            println!("{:?}\t{:?}\t{:?}", root.x + hw, root.y + hw, root.z + hw);
+        }
+        Node::Group(x) => {
+            let mut n = 0;
+            for subnode in x {
+                let coord = corners()[n] * width + root;
+                points_out(subnode, coord, width / 2.0);
+                n += 1;
+            }
+        }
+        Node::Empty => {
+        }
+    }
+}
+
+fn main() {
+    let width = 10.0f64;
+    let root = Coordinate::new(0.0, 0.0, 0.0);
+
+    let mut tree: Octree = octree::octree::new(width, root, val_func);
+    tree.build();
+    
+    image_out(&tree);
+
     
     
    
