@@ -7,7 +7,8 @@ An Octree implementation in Rust. Mainly for learning a new language!
 This library creates a octree of a certain size based on a given value function.
 The algorithm checks if there is a significant difference between the values inside the cube.
 The function it uses to determine the values is the previously named value function.
-In this example it's 1/r^2, where r is the distance from the coordinate to a fixed point.
+In this example it's a check if it's inside a sphere. The result is then raycast and outputted to a png.
+
 
 ## Requirements
 
