@@ -40,26 +40,6 @@ impl Node {
 
         return Node::Group(tree);
     }
-
-    pub fn find_value_at(node: &Node, coord: Coordinate, root: Coordinate, width: f64) -> (char, f64) {
-        match node {
-            &Node::Filled => {
-                return ('f', width);
-            },
-            &Node::Empty => {
-                return ('e', width);
-            },
-            &Node::Group(ref group) => {
-                let mut vec = (coord - root) / width;
-                let index: i16 = vec[2].round() as i16 * 4 + vec[1].round() as i16 * 2 + vec[0].round() as i16;
-                let new_root = root + corner(index) * width;
-                return Node::find_value_at(&group[index as usize], coord, new_root, width / 2.0);
-
-                return ('e', width);
-            },
-
-        }
-    }
 }
 
 impl Octree {
@@ -69,7 +49,28 @@ impl Octree {
     }
 
     pub fn value_at(&self, coordinate: Coordinate) -> (char, f64) {
-        return Node::find_value_at(&self.nodes, coordinate, self.root, self.width);
+        let mut reference = &self.nodes;
+        let mut width = self.width;
+        let mut root = self.root;
+        
+        loop {
+            match reference {
+                &Node::Filled => {
+                    return ('f', width);
+                },
+                &Node::Empty => {
+                    return ('e', width);
+                },
+                &Node::Group(ref group) => {
+                    let mut vec = (coordinate - root) / width;
+                    let index: i16 = vec[2].round() as i16 * 4 + vec[1].round() as i16 * 2 + vec[0].round() as i16;
+                    root = root + corner(index) * width;
+                    width = width / 2.0;
+                    reference = &group[index as usize];
+                },
+            }
+        }
+        return ('e', self.width);
     }
 
     pub fn coordinate_in_cube(&self, coordinate: Coordinate) -> bool {
