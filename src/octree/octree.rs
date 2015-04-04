@@ -20,8 +20,6 @@ pub struct Octree {
 pub type Coordinate  = Vec3<f64>;
 pub type Coordinates = Vec<Coordinate>;
 
-//type Coordinates = Vec<Coordinate>;
-
 impl Node {
     pub fn build(root: Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> Node {
         let mut tree: Vec<Node> = Vec::new();

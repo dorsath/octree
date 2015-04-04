@@ -61,10 +61,7 @@ fn image_out(tree: &Octree) {
             normal: normal,
             point: point
         };
-        //println!("{:?}\t{:?}\t{:?}", normal.x, normal.y, normal.z);
-        //println!("{:?} {:?}", normal, point);
         let a = octree::raycasting::build(&tree, pixel, width, root);
-        //println!("{:?} {:?} {:?}", normal, point, a);
 
         *img_pixel = image::Luma([a]);
     }
@@ -102,21 +99,4 @@ fn main() {
     
     image_out(&tree);
 
-    
-    
-   
-    //Vec3 { x: 0, y: 0, z: 1 } Vec3 { x: 5, y: 5, z: -20 } false
-    //Vec3 { x: 0.258776, y: -0.017644, z: 0.965776 } Vec3 { x: 9.01919, y: 4.725964, z: -20 }
-    //let pixel = Pixel { 
-    //    normal: Vector::new(0.258776, -0.017644, 0.965776),
-    //    point: Coordinate::new(9.01919, 4.725964, -20.0)
-    //};
-
-    //let a = octree::raycasting::build(&tree, pixel, width, root);
-
-    //println!("{:?}", a);
-
-    //let node = tree.nodes.clone();
-    //points_out(node, tree.root, tree.width);
-    //debug_out(tree);
 }
