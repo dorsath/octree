@@ -13,8 +13,8 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn value_at(&self, coordinate: Coordinate) -> bool {
-        let relative = (coordinate - self.root);
+    pub fn value_at(&self, coordinate: &Coordinate) -> bool {
+        let relative = (*coordinate - self.root);
         return relative.x >= 0.0 && relative.x <= self.width &&
                relative.y >= 0.0 && relative.y <= self.height &&
                relative.z >= 0.0 && relative.z <= self.depth;
@@ -27,8 +27,8 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn value_at(&self, coordinate: Coordinate) -> bool {
-        return (coordinate - self.root).norm() <= self.radius;
+    pub fn value_at(&self, coordinate: &Coordinate) -> bool {
+        return (*coordinate - self.root).norm() <= self.radius;
     }
 }
 
@@ -41,7 +41,7 @@ impl Scene {
         return Scene { objects: vec![] };
     }
 
-    pub fn value_at(&self, coordinate: Coordinate) -> bool {
+    pub fn value_at(&self, coordinate: &Coordinate) -> bool {
         for object in self.objects.iter() {
             match object {
                 &Primitive::Sphere(ref obj) => {

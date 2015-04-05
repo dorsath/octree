@@ -2,6 +2,7 @@ extern crate nalgebra;
 
 use nalgebra::*;
 use std::num::Float;
+use super::scene::{Scene};
 
 #[derive(Debug, Clone)]
 pub enum Node {
@@ -14,21 +15,20 @@ pub struct Octree {
     pub root: Coordinate,
     pub width: f64,
     pub nodes: Node,
-    pub value_function: fn(&Coordinate) -> bool,
 }
 
 pub type Coordinate  = Vec3<f64>;
 pub type Coordinates = Vec<Coordinate>;
 
 impl Node {
-    pub fn build(root: Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> Node {
+    pub fn build(root: Coordinate, width: f64, scene: &Scene) -> Node {
         let mut tree: Vec<Node> = Vec::new();
 
         for corner in corners().iter() {
             let coord = *corner * width + root;
-            let cube_status = split(&coord, width, value_function);
+            let cube_status = split(&coord, width, scene);
             if width >= 0.4 && cube_status == 'p' {
-                tree.push(Node::build(coord, width / 2.0, value_function));
+                tree.push(Node::build(coord, width / 2.0, scene));
             } else if cube_status == 'f'  {
                 tree.push(Node::Filled);
             } else {
@@ -41,8 +41,8 @@ impl Node {
 }
 
 impl Octree {
-    pub fn build(&mut self) {
-        self.nodes = Node::build(self.root, self.width, self.value_function);
+    pub fn build(&mut self, scene: &Scene) {
+        self.nodes = Node::build(self.root, self.width, scene);
 
     }
 
@@ -78,22 +78,21 @@ impl Octree {
     }
 }
 
-pub fn new(width: f64, root: Coordinate, value_function: fn(&Coordinate) -> bool) -> Octree {
+pub fn new(width: f64, root: Coordinate) -> Octree {
     return Octree {
         root: root,
         width: width,
-        nodes: Node::Filled,
-        value_function: value_function      
+        nodes: Node::Filled
     }
 }
 
-fn split(root: &Coordinate, width: f64, value_function: fn(&Coordinate) -> bool) -> char {
+fn split(root: &Coordinate, width: f64, scene: &Scene) -> char {
     let mut filled = 0;
     let mut empty = 0;
 
     let hw = width / 2.0; //half width
     let center: Coordinate = *root + Coordinate::new(hw, hw ,hw);
-    let center_value = value_function(&center);
+    let center_value = scene.value_at(&center);
 
     if center_value {
         filled += 1;
@@ -105,7 +104,7 @@ fn split(root: &Coordinate, width: f64, value_function: fn(&Coordinate) -> bool)
     for node in corners() {
         let node_corner = *root + (node * width);
         
-        if value_function(&node_corner) {
+        if scene.value_at(&node_corner) {
             filled += 1;
         } else {
             empty += 1;

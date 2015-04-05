@@ -51,7 +51,9 @@ fn image_out(tree: &Octree) {
     
     let mut imgbuf = image::ImageBuffer::new(img_width, img_height);
     
+    let mut n = 0;
     for (img_x, img_y, img_pixel) in imgbuf.enumerate_pixels_mut() {
+        //println!("{:?}", n);
         let x = img_x as f64 - (img_width as f64)/2.0;
         let y = img_y as f64 - (img_height as f64)/2.0;
 
@@ -64,7 +66,9 @@ fn image_out(tree: &Octree) {
         };
         let a = octree::raycasting::build(&tree, pixel, width, root);
 
+
         *img_pixel = image::Luma([a]);
+        n += 1;
     }
 
     let ref mut fout = File::create(&Path::new("octree.png")).unwrap();
@@ -99,15 +103,15 @@ fn main() {
     let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0 };
     scene.objects.push(Primitive::Sphere(obj));
 
-    let obj = Cube { root: Coordinate::new(0.0, 0.0, 0.0), width: 3.0, height: 3.0, depth: 3.0 };
+    let obj = Cube { root: Coordinate::new(5.0, 5.0, 3.0), width: 3.0, height: 3.0, depth: 3.0 };
     scene.objects.push(Primitive::Cube(obj));
-    let a = scene.value_at(Coordinate::new(2.0, 2.0, 2.0));
-    println!("{:?}", a);
+    //let a = scene.value_at(&Coordinate::new(2.0, 2.0, 2.0));
+    //println!("{:?}", a);
         
 
-    let mut tree: Octree = octree::octree::new(width, root, val_func);
-    tree.build();
+    let mut tree: Octree = octree::octree::new(width, root);
+    tree.build(&scene);
     
-    //image_out(&tree);
+    image_out(&tree);
 
 }
