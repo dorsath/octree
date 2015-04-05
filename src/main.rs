@@ -4,6 +4,7 @@ pub mod octree;
 
 use octree::octree::*;
 use octree::raycasting::{Pixel, Vector};
+use octree::scene::*;
 
 use std::num::Float;
 use nalgebra::*;
@@ -93,10 +94,20 @@ fn points_out(node: Node, root: Coordinate, width: f64) {
 fn main() {
     let width = 10.0f64;
     let root = Coordinate::new(0.0, 0.0, 0.0);
+    let mut scene = Scene::new();
+
+    let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0 };
+    scene.objects.push(Primitive::Sphere(obj));
+
+    let obj = Cube { root: Coordinate::new(0.0, 0.0, 0.0), width: 3.0, height: 3.0, depth: 3.0 };
+    scene.objects.push(Primitive::Cube(obj));
+    let a = scene.value_at(Coordinate::new(2.0, 2.0, 2.0));
+    println!("{:?}", a);
+        
 
     let mut tree: Octree = octree::octree::new(width, root, val_func);
     tree.build();
     
-    image_out(&tree);
+    //image_out(&tree);
 
 }

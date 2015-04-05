@@ -60,7 +60,7 @@ impl Octree {
                     return ('e', width);
                 },
                 &Node::Group(ref group) => {
-                    let mut vec = (coordinate - root) / width;
+                    let vec = (coordinate - root) / width;
                     let index: i16 = vec[2].round() as i16 * 4 + vec[1].round() as i16 * 2 + vec[0].round() as i16;
                     root = root + corner(index) * width;
                     width = width / 2.0;
@@ -68,7 +68,6 @@ impl Octree {
                 },
             }
         }
-        return ('e', self.width);
     }
 
     pub fn coordinate_in_cube(&self, coordinate: Coordinate) -> bool {
