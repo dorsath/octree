@@ -29,5 +29,6 @@ file = "out.txt"
 #set xrange [0:5]
 #set yrange [0:5]
 #set zrange [0:1000]
+set view equal xyz
 splot file using 1:2:3 pt 7 ps 0.3
 pause -1

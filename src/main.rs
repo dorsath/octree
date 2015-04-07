@@ -42,33 +42,54 @@ fn image_out(tree: &Octree) {
     let img_width = 400;
     let img_height = 300;
 
-    let ratio = img_height as f64 / img_width as f64;
-    let screen_position = Coordinate::new(5.0, 5.0, 0.0);
-    let camera_position = Coordinate::new(5.0, 5.0, -10.0);
+
+    //let ratio = img_height as f64 / img_width as f64;
+    //let screen_position = Coordinate::new(5.0, 5.0, 0.0);
+    //let camera_position = Coordinate::new(5.0, 5.0, -10.0);
+    //let dx =  (Float::sin(field_of_view / 2.0) * (camera_position.z - screen_position.z) * 2.0) / img_width as f64;
+    //let dy = dx; 
+    //------------------------
+
+    //config
+    let camera_aim = Coordinate::new(5.0, 5.0, 5.0);
+    let distance = 10.0f64;
     let field_of_view = 60.0; //deg
-    let dx =  (Float::sin(field_of_view / 2.0) * (camera_position.z - screen_position.z) * 2.0) / img_width as f64;
-    let dy = dx; 
+    
+    //calcs
+    let ratio = img_height as f64 / img_width as f64;
+    let camera_origin = camera_aim + Coordinate::new(0.0, 0.0, -1.0 * distance);
+    let deg_per_pixel = field_of_view / img_width as f64;
+    let z = (img_width as f64 / 2.0) / Float::tan( (field_of_view / 2.0) / 360.0 * 2.0 * 3.14 );//img_width as f64) / 2.0 ;
+    println!("{:?}", camera_origin);
+
+    //let y = 0.0f64;
+    //for img_x in 0..img_width {
+    //    for img_y in 0..img_height {
+    //        let x = img_x as f64 - (img_width as f64) /2.0;
+    //        let y = img_y as f64 - (img_height as f64) /2.0;
+    //        let coord = Coordinate::new(x,y,z).normalize();
+    //    }
+    //}
     
     let mut imgbuf = image::ImageBuffer::new(img_width, img_height);
-    
-    let mut n = 0;
+    //
+    //let mut n = 0;
     for (img_x, img_y, img_pixel) in imgbuf.enumerate_pixels_mut() {
-        //println!("{:?}", n);
-        let x = img_x as f64 - (img_width as f64)/2.0;
-        let y = img_y as f64 - (img_height as f64)/2.0;
-
-        let point   = screen_position + Coordinate::new(dx * (x as f64), dy * (y as f64), 0.0);
-        let normal  = (camera_position - point).normalize();
+    //}
+        let x = img_x as f64 - (img_width as f64) /2.0;
+        let y = img_y as f64 - (img_height as f64) /2.0;
+        let normal = Coordinate::new(x,y,z).normalize();
 
         let pixel = Pixel { 
             normal: normal,
-            point: point
+            point: camera_origin
         };
+        //println!("{:?}\t{:?}\t{:?}\n", pixel.normal.x, pixel.normal.y, pixel.normal.z );
         let a = octree::raycasting::build(&tree, pixel, width, root);
 
 
         *img_pixel = image::Luma([a]);
-        n += 1;
+    //    n += 1;
     }
 
     let ref mut fout = File::create(&Path::new("octree.png")).unwrap();
