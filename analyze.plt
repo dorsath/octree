@@ -1,4 +1,4 @@
-file = "out.txt"
+file = "results.txt"
 # W = F * t
 # W/t = F
 #f(x) = 1/((x-4)*(x-2)*(x-1))

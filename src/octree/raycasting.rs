@@ -24,8 +24,8 @@ pub struct Face {
 }
 
 
-pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> u8{
-    let faces = faces(width, root);
+pub fn build(tree: &Octree, pixel: Pixel) -> u8{
+    let faces = faces(tree.width, tree.root);
     let mut closest: f64 = -1.0;
     let mut largest: f64 = -2.0;
 
@@ -59,10 +59,12 @@ pub fn build(tree: &Octree, pixel: Pixel, width: f64, root: Coordinate) -> u8{
     while distance <= largest {
         let coordinate = pixel.coord_at(distance);
         let (val, node_size) = tree.value_at(coordinate);
-        distance += node_size;
+        distance += node_size / 2.0;
         if val == 'f' {
             //println!("{:?}", node_size);
-            return (coordinate.z / width * 255.0) as u8 ;
+            let a = 255.0 - (pixel.point - coordinate).norm().powf(2.0);
+            //return ((pixel.point - coordinate).norm() / tree.width * 255.0) as u8 ;
+            return a as u8;
         }
     }
     return 0;
