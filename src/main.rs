@@ -37,8 +37,8 @@ fn debug_out(tree: Octree) {
 }
 
 fn image_out(tree: &Octree, distance: f64) {
-    let img_width = 800;
-    let img_height = 600;
+    let img_width = 400;
+    let img_height = 300;
 
     //config
     let camera_aim = Coordinate::new(5.0, 5.0, 5.0);
@@ -98,10 +98,13 @@ fn main() {
     let mut scene = Scene::new();
 
 
-    let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0, add: false };
+    let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 2.0 };
     scene.objects.push(Primitive::Sphere(obj));
 
-    let obj = Cube { root: Coordinate::new(1.0, 4.0, 2.0), width: 8.0, height: 2.0, depth: 3.0, add: true };
+    //let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0, add: true };
+    //scene.objects.push(Primitive::Sphere(obj));
+
+    let obj = Cube { root: Coordinate::new(2.0, 2.0, 5.0), width: 6.0, height: 6.0, depth: 6.0};
     scene.objects.push(Primitive::Cube(obj));
     
 
@@ -114,8 +117,8 @@ fn main() {
 
     let mut tree: Octree = octree::octree::new(width, root);
     tree.build(&scene);
-    //let coord = Coordinate::new(5.0, 5.0, 5.0);
-    //let a = scene.value_at(&coord, 1.0);
+    //let coord = Coordinate::new(2.5, 2.5, 2.5);
+    //let a = scene.value_at(&coord, 1.25);
     //println!("{:?}", a);
 
 

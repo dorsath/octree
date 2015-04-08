@@ -27,8 +27,8 @@ file = "results.txt"
 #     'results.txt' using 1:3 with lines
 
 set xrange [0:10]
-set yrange [0:10]
+set yrange [0:4]
 set zrange [0:10]
 set view equal xyz
-splot file using 1:2:3 pt 7 ps 0.3
+splot file using 1:3:2 pt 7 ps 0.3
 pause -1

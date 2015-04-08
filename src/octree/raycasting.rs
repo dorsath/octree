@@ -74,7 +74,7 @@ pub fn faces(width: f64, root: Coordinate) -> Vec<Face> {
     return vec![
         Face {
             point:  Coordinate::new(0.5, 0.5, 0.0) * width + root,
-            normal: Vector::new(0.0, 0.0, 1.0),
+            normal: Vector::new(0.0, 0.0, -1.0),
         },
 
 
@@ -85,7 +85,7 @@ pub fn faces(width: f64, root: Coordinate) -> Vec<Face> {
 
         Face {
             point:  Coordinate::new(0.0, 0.5, 0.5) * width + root,
-            normal: Vector::new(1.0, 0.0, 0.0),
+            normal: Vector::new(-1.0, 0.0, 0.0),
         },
 
 
@@ -97,7 +97,7 @@ pub fn faces(width: f64, root: Coordinate) -> Vec<Face> {
 
         Face {
             point:  Coordinate::new(0.5, 0.0, 0.5) * width + root,
-            normal: Vector::new(0.0, 1.0, 0.0),
+            normal: Vector::new(0.0, -1.0, 0.0),
         },
 
 

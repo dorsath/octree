@@ -10,7 +10,6 @@ pub struct Cube {
     pub width: f64,
     pub height: f64,
     pub depth: f64,
-    pub add: bool
 }
 
 impl Cube {
@@ -49,52 +48,40 @@ impl Cube {
 pub struct Sphere {
     pub root: Coordinate,
     pub radius: f64,
-    pub add: bool
 }
 
 impl Sphere {
     pub fn value_at(&self, coordinate: &Coordinate, width: f64) -> char {
-        let relative = (*coordinate - self.root);
+        let min = *coordinate;
+        let max = min + Coordinate::new(width, width, width);
 
-
-
-        let S = self.root;
-        let C1 = *coordinate;
-        let C2 = C1 + Coordinate::new(width, width, width);
-        let R = self.radius;
-        let mut dist_squared = R * R;
-        /* assume C1 and C2 are element-wise sorted, if not, do that now */
-        if (S.x < C1.x) {
-            dist_squared -= squared(S.x - C1.x);
-        } else if (S.x > C2.x) {
-            dist_squared -= squared(S.x - C2.x);
-        }
-
-        if (S.y < C1.y) {
-            dist_squared -= squared(S.y - C1.y);
-        } else if (S.y > C2.y) {
-            dist_squared -= squared(S.y - C2.y);
-        }
-
-        if (S.z < C1.z) {
-            dist_squared -= squared(S.z - C1.z);
-        } else if (S.z > C2.z) {
-            dist_squared -= squared(S.z - C2.z);
-        }
-
-        if dist_squared > 0.0 {
-            if relative.norm() < self.radius && //root inside & opposite corner inside
-                (C2 - self.root).norm() < self.radius { 
-                return 'f'
+        let mut d = 0.0;
+        for axis in vec![0usize, 1, 2] {
+            let e = self.root[axis] - min[axis];
+            if e < 0.0 {
+                if (e < -1.0 * self.radius) {
+                    return 'e'
+                }
+                d += e * e;
             } else {
+                let e = self.root[axis] - max[axis];
+                if e > 0.0 {
+                    if (e > self.radius) {
+                        return 'e'
+                    }
+                    d += e * e;
+                }
+            }
+        }
+
+        for corner in super::octree::corners() {
+            if ((corner * width + min) - self.root).norm() > self.radius {
                 return 'p';
             }
-        } else {
+        }
 
-            return 'e';//(*coordinate - self.root).norm() <= self.radius;
-        } 
+        return 'f';
     }
-
 }
 
 fn squared(value: f64) -> f64 {
@@ -119,43 +106,41 @@ impl Scene {
             match object {
                 &Primitive::Sphere(ref obj) => {
                     let response = obj.value_at(coordinate, width);
-                    if response == 'f' {
-                        if obj.add {
-                            positive = true;
-                        } else {
-                            negative = true;
-                        }
-                    } else if response == 'p' {
-                        partial = true;
+
+                    match response {
+                        'f' => {
+                            positive = true;   
+                        },
+                        'p' => {
+                            partial = true;
+                        },
+                        _ => {}
                     }
                 },
                 &Primitive::Cube(ref obj) => {
                     let response = obj.value_at(coordinate, width);
-                    if response == 'f' {
-                        if obj.add {
-                            positive = true;
-                        } else {
-                            negative = true;
-                        }
-                    } else if response == 'p' {
-                        partial = true;
+                    match response {
+                        'f' => {
+                            positive = true;   
+                        },
+                        'p' => {
+                            partial = true;
+                        },
+                        _ => {}
                     }
                 }
             }
         }
-        if positive && negative {
-            return 'p'
-        } else if positive {
+        
+        if positive {
             return 'f'
-        } else if negative {
-            return 'e'
         }
 
         if partial {
             return 'p'
-        } else {
-            return 'e'
         }
+
+        return 'e'
     }
 }
 
