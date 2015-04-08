@@ -26,9 +26,9 @@ file = "results.txt"
 #plot 'results.txt' using 1:2 with lines, \
 #     'results.txt' using 1:3 with lines
 
-#set xrange [0:5]
-#set yrange [0:5]
-#set zrange [0:1000]
+set xrange [0:10]
+set yrange [0:10]
+set zrange [0:10]
 set view equal xyz
 splot file using 1:2:3 pt 7 ps 0.3
 pause -1

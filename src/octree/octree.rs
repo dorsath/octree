@@ -27,7 +27,7 @@ impl Node {
         for corner in corners().iter() {
             let coord = *corner * width + root;
             let cube_status = split(&coord, width, scene);
-            if width >= 0.4 && cube_status == 'p' {
+            if width >= 0.05 && cube_status == 'p' {
                 tree.push(Node::build(coord, width / 2.0, scene));
             } else if cube_status == 'f'  {
                 tree.push(Node::Filled);
@@ -87,38 +87,40 @@ pub fn new(width: f64, root: Coordinate) -> Octree {
 }
 
 fn split(root: &Coordinate, width: f64, scene: &Scene) -> char {
-    let mut filled = 0;
-    let mut empty = 0;
+    //let mut filled = 0;
+    //let mut empty = 0;
 
-    let hw = width / 2.0; //half width
-    let center: Coordinate = *root + Coordinate::new(hw, hw ,hw);
-    let center_value = scene.value_at(&center);
+    return scene.value_at(&root, width);
+    
+    //let hw = width / 2.0; //half width
+    //let center: Coordinate = *root + Coordinate::new(hw, hw ,hw);
+    //let center_value = scene.value_at(&center);
 
-    if center_value {
-        filled += 1;
-    } else {
-        empty += 1;
-    }
+    //if center_value {
+    //    filled += 1;
+    //} else {
+    //    empty += 1;
+    //}
 
 
-    for node in corners() {
-        let node_corner = *root + (node * width);
-        
-        if scene.value_at(&node_corner) {
-            filled += 1;
-        } else {
-            empty += 1;
-        }
+    //for node in corners() {
+    //    let node_corner = *root + (node * width);
+    //    
+    //    if scene.value_at(&node_corner) {
+    //        filled += 1;
+    //    } else {
+    //        empty += 1;
+    //    }
 
-        if filled > 0 && empty > 0 {
-            return 'p';
-        }
-    }
-    if filled == 9 {
-        return 'f'
-    } else {
-        return 'e'
-    }
+    //    if filled > 0 && empty > 0 {
+    //        return 'p';
+    //    }
+    //}
+    //if filled == 9 {
+    //    return 'f'
+    //} else {
+    //    return 'e'
+    //}
 }
 
 

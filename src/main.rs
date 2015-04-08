@@ -56,6 +56,7 @@ fn image_out(tree: &Octree, distance: f64) {
         let x = (img_width as f64) /2.0 -  img_x as f64;
         let y = (img_height as f64) /2.0 -  img_y as f64;
         let normal = Coordinate::new(x,y,z).normalize();
+        print!("pixel: {:?}:{:?}\r", img_x, img_y);
 
         let pixel = Pixel { 
             normal: normal,
@@ -99,10 +100,10 @@ fn main() {
     let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0 };
     scene.objects.push(Primitive::Sphere(obj));
 
-    let obj = Sphere { root: Coordinate::new(7.0, 7.0, 5.0), radius: 1.5 };
-    scene.objects.push(Primitive::Sphere(obj));
+    //let obj = Sphere { root: Coordinate::new(7.0, 7.0, 5.0), radius: 1.5 };
+    //scene.objects.push(Primitive::Sphere(obj));
 
-    let obj = Cube { root: Coordinate::new(1.0, 4.0, 4.0), width: 8.0, height: 2.0, depth: 2.0 };
+    let obj = Cube { root: Coordinate::new(1.0, 4.0, 4.0), width: 8.0, height: 4.0, depth: 2.0 };
     scene.objects.push(Primitive::Cube(obj));
     //let a = scene.value_at(&Coordinate::new(2.0, 2.0, 2.0));
     //println!("{:?}", a);
@@ -110,6 +111,11 @@ fn main() {
 
     let mut tree: Octree = octree::octree::new(width, root);
     tree.build(&scene);
+    //let coord = Coordinate::new(5.0, 5.0, 5.0);
+    //let a = scene.value_at(&coord, 1.0);
+    //println!("{:?}", a);
+
+
     //points_out(tree.nodes, root, width);
 
     image_out(&tree, 20.0);

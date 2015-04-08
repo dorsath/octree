@@ -13,11 +13,35 @@ pub struct Cube {
 }
 
 impl Cube {
-    pub fn value_at(&self, coordinate: &Coordinate) -> bool {
-        let relative = (*coordinate - self.root);
-        return relative.x >= 0.0 && relative.x <= self.width &&
+    pub fn value_at(&self, tree_root: &Coordinate, tree_width: f64) -> char {
+        let relative = (*tree_root - self.root);
+        let root_inside = relative.x >= 0.0 && relative.x <= self.width &&
                relative.y >= 0.0 && relative.y <= self.height &&
                relative.z >= 0.0 && relative.z <= self.depth;
+
+        //when the cube exceeds the tree_node's cube.
+        if root_inside && 
+            relative.x + tree_width < self.width && 
+            relative.y + tree_width < self.height &&
+            relative.z + tree_width < self.depth {
+            return 'f'
+        }
+
+
+        //http://stackoverflow.com/questions/5009526/overlapping-cubes
+        let cond1 = self.root.x + self.width < tree_root.x;
+        let cond2 = tree_root.x + tree_width < self.root.x;
+        let cond3 = self.root.y + self.height < tree_root.y;
+        let cond4 = tree_root.y + tree_width < self.root.y;
+        let cond5 = self.root.z + self.depth < tree_root.z;
+        let cond6 = tree_root.z + tree_width < self.root.z;
+
+
+        if cond1 || cond2 || cond3 || cond4 || cond5 || cond6 {
+            return 'e'
+        } else {
+            return 'p'
+        }
     }
 }
 
@@ -27,10 +51,54 @@ pub struct Sphere {
 }
 
 impl Sphere {
-    pub fn value_at(&self, coordinate: &Coordinate) -> bool {
-        return (*coordinate - self.root).norm() <= self.radius;
+    pub fn value_at(&self, coordinate: &Coordinate, width: f64) -> char {
+        let relative = (*coordinate - self.root);
+
+
+
+        let S = self.root;
+        let C1 = *coordinate;
+        let C2 = C1 + Coordinate::new(width, width, width);
+        let R = self.radius;
+        let mut dist_squared = R * R;
+        /* assume C1 and C2 are element-wise sorted, if not, do that now */
+        if (S.x < C1.x) {
+            dist_squared -= squared(S.x - C1.x);
+        } else if (S.x > C2.x) {
+            dist_squared -= squared(S.x - C2.x);
+        }
+
+        if (S.y < C1.y) {
+            dist_squared -= squared(S.y - C1.y);
+        } else if (S.y > C2.y) {
+            dist_squared -= squared(S.y - C2.y);
+        }
+
+        if (S.z < C1.z) {
+            dist_squared -= squared(S.z - C1.z);
+        } else if (S.z > C2.z) {
+            dist_squared -= squared(S.z - C2.z);
+        }
+
+        if dist_squared > 0.0 {
+            if relative.norm() < self.radius && //root inside & opposite corner inside
+                (C2 - self.root).norm() < self.radius { 
+                return 'f'
+            } else {
+                return 'p';
+            }
+        } else {
+
+            return 'e';//(*coordinate - self.root).norm() <= self.radius;
+        } 
     }
+
 }
+
+fn squared(value: f64) -> f64 {
+    return value * value;
+}
+
 
 pub struct Scene {
     pub objects: Vec<Primitive>,
@@ -41,22 +109,33 @@ impl Scene {
         return Scene { objects: vec![] };
     }
 
-    pub fn value_at(&self, coordinate: &Coordinate) -> bool {
+    pub fn value_at(&self, coordinate: &Coordinate, width: f64) -> char {
+        let mut partial = false;
         for object in self.objects.iter() {
             match object {
                 &Primitive::Sphere(ref obj) => {
-                    if obj.value_at(coordinate) {
-                        return true;
+                    let response = obj.value_at(coordinate, width);
+                    if response == 'f' {
+                        return 'f';
+                    } else if response == 'p' {
+                        partial = true;
                     }
                 },
                 &Primitive::Cube(ref obj) => {
-                    if obj.value_at(coordinate) {
-                        return true;
+                    let response = obj.value_at(coordinate, width);
+                    if response == 'f' {
+                        return 'f';
+                    } else if response == 'p' {
+                        partial = true;
                     }
                 }
             }
         }
-        return false;
+        if partial {
+            return 'p'
+        } else {
+            return 'e'
+        }
     }
 }
 
