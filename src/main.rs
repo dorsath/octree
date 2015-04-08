@@ -97,14 +97,17 @@ fn main() {
     let root = Coordinate::new(0.0, 0.0, 0.0);
     let mut scene = Scene::new();
 
-    let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0 };
+
+    let obj = Sphere { root: Coordinate::new(5.0, 5.0, 5.0), radius: 3.0, add: false };
     scene.objects.push(Primitive::Sphere(obj));
+
+    let obj = Cube { root: Coordinate::new(1.0, 4.0, 2.0), width: 8.0, height: 2.0, depth: 3.0, add: true };
+    scene.objects.push(Primitive::Cube(obj));
+    
 
     //let obj = Sphere { root: Coordinate::new(7.0, 7.0, 5.0), radius: 1.5 };
     //scene.objects.push(Primitive::Sphere(obj));
 
-    let obj = Cube { root: Coordinate::new(1.0, 4.0, 4.0), width: 8.0, height: 4.0, depth: 2.0 };
-    scene.objects.push(Primitive::Cube(obj));
     //let a = scene.value_at(&Coordinate::new(2.0, 2.0, 2.0));
     //println!("{:?}", a);
         

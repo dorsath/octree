@@ -9,7 +9,8 @@ pub struct Cube {
     pub root: Coordinate,
     pub width: f64,
     pub height: f64,
-    pub depth: f64
+    pub depth: f64,
+    pub add: bool
 }
 
 impl Cube {
@@ -47,7 +48,8 @@ impl Cube {
 
 pub struct Sphere {
     pub root: Coordinate,
-    pub radius: f64
+    pub radius: f64,
+    pub add: bool
 }
 
 impl Sphere {
@@ -110,13 +112,19 @@ impl Scene {
     }
 
     pub fn value_at(&self, coordinate: &Coordinate, width: f64) -> char {
+        let mut positive = false;
+        let mut negative = false;
         let mut partial = false;
         for object in self.objects.iter() {
             match object {
                 &Primitive::Sphere(ref obj) => {
                     let response = obj.value_at(coordinate, width);
                     if response == 'f' {
-                        return 'f';
+                        if obj.add {
+                            positive = true;
+                        } else {
+                            negative = true;
+                        }
                     } else if response == 'p' {
                         partial = true;
                     }
@@ -124,13 +132,25 @@ impl Scene {
                 &Primitive::Cube(ref obj) => {
                     let response = obj.value_at(coordinate, width);
                     if response == 'f' {
-                        return 'f';
+                        if obj.add {
+                            positive = true;
+                        } else {
+                            negative = true;
+                        }
                     } else if response == 'p' {
                         partial = true;
                     }
                 }
             }
         }
+        if positive && negative {
+            return 'p'
+        } else if positive {
+            return 'f'
+        } else if negative {
+            return 'e'
+        }
+
         if partial {
             return 'p'
         } else {

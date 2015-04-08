@@ -27,7 +27,7 @@ impl Node {
         for corner in corners().iter() {
             let coord = *corner * width + root;
             let cube_status = split(&coord, width, scene);
-            if width >= 0.05 && cube_status == 'p' {
+            if width >= 0.5 && cube_status == 'p' {
                 tree.push(Node::build(coord, width / 2.0, scene));
             } else if cube_status == 'f'  {
                 tree.push(Node::Filled);
