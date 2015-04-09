@@ -14,7 +14,7 @@ pub struct Cube {
 
 impl Cube {
     pub fn value_at(&self, tree_root: &Coordinate, tree_width: f64) -> char {
-        let relative = (*tree_root - self.root);
+        let relative = *tree_root - self.root;
         let root_inside = relative.x >= 0.0 && relative.x <= self.width &&
                relative.y >= 0.0 && relative.y <= self.height &&
                relative.z >= 0.0 && relative.z <= self.depth;
@@ -59,14 +59,14 @@ impl Sphere {
         for axis in vec![0usize, 1, 2] {
             let e = self.root[axis] - min[axis];
             if e < 0.0 {
-                if (e < -1.0 * self.radius) {
+                if e < -1.0 * self.radius {
                     return 'e'
                 }
                 d += e * e;
             } else {
                 let e = self.root[axis] - max[axis];
                 if e > 0.0 {
-                    if (e > self.radius) {
+                    if e > self.radius {
                         return 'e'
                     }
                     d += e * e;
@@ -84,11 +84,6 @@ impl Sphere {
     }
 }
 
-fn squared(value: f64) -> f64 {
-    return value * value;
-}
-
-
 pub struct Scene {
     pub objects: Vec<Primitive>,
 }
@@ -100,7 +95,6 @@ impl Scene {
 
     pub fn value_at(&self, coordinate: &Coordinate, width: f64) -> char {
         let mut positive = false;
-        let mut negative = false;
         let mut partial = false;
         for object in self.objects.iter() {
             match object {
